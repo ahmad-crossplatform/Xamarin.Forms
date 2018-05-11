@@ -12,6 +12,7 @@ using AColorDraw = Android.Graphics.Drawables.ColorDrawable;
 using Xamarin.Forms.Internals;
 using Android.Support.V4.Widget;
 using Android.OS;
+using System;
 
 namespace Xamarin.Forms.Platform.Android
 {
@@ -156,6 +157,19 @@ namespace Xamarin.Forms.Platform.Android
 			_detailText.SetTextColor(color.ToAndroid(_defaultDetailColor));
 		}
 
+		internal async void SetImageSource(IImageController source)
+		{
+			try
+			{
+				_imageSource = source?.Source;
+				await _imageView.UpdateBitmap(source);
+			}
+			catch (Exception ex)
+			{
+				Log.Warning(nameof(BaseCellView), "Error loading image: {0}", ex);
+			}
+		}
+
 		public void SetImageSource(ImageSource source)
 		{
 			UpdateBitmap(source, _imageSource);
@@ -189,35 +203,14 @@ namespace Xamarin.Forms.Platform.Android
 
 		async void UpdateBitmap(ImageSource source, ImageSource previousSource = null)
 		{
-			if (Equals(source, previousSource))
-				return;
-
-			_imageView.SetImageResource(global::Android.Resource.Color.Transparent);
-
-			Bitmap bitmap = null;
-			IImageSourceHandler handler;
-
-			if (source != null && (handler = Registrar.Registered.GetHandlerForObject<IImageSourceHandler>(source)) != null)
+			try
 			{
-				try
-				{
-					bitmap = await handler.LoadImageAsync(source, Context);
-				}
-				catch (TaskCanceledException)
-				{
-				}
-				catch (IOException ex)
-				{
-					Log.Warning("Xamarin.Forms.Platform.Android.BaseCellView", "Error updating bitmap: {0}", ex);
-				}
+				await _imageView.UpdateBitmap(source, previousSource);
 			}
-
-			if (bitmap == null && source is FileImageSource)
-				_imageView.SetImageResource(ResourceManager.GetDrawableByName(((FileImageSource)source).File));
-			else
-				_imageView.SetImageBitmap(bitmap);
-
-			bitmap?.Dispose();
+			catch (Exception ex)
+			{
+				Log.Warning(nameof(BaseCellView), "Error loading image: {0}", ex);
+			}
 		}
 	}
 }

@@ -9,6 +9,7 @@ using Android.Graphics.Drawables;
 using Android.Support.V4.Content;
 using Path = System.IO.Path;
 using Xamarin.Forms.Internals;
+using AndroidAppCompat = Android.Support.V7.Content.Res.AppCompatResources;
 
 namespace Xamarin.Forms.Platform.Android
 {
@@ -68,7 +69,7 @@ namespace Xamarin.Forms.Platform.Android
 				return null;
 			}
 
-			return ContextCompat.GetDrawable(Forms.Context, id);
+			return AndroidAppCompat.GetDrawable(Forms.Context, id);
 		}
 
 		public static Drawable GetDrawable(this Context context, string name)
@@ -80,7 +81,7 @@ namespace Xamarin.Forms.Platform.Android
 				return null;
 			}
 
-			return ContextCompat.GetDrawable(context, id);
+			return AndroidAppCompat.GetDrawable(context, id);
 		}
 
 		public static int GetDrawableByName(string name)
